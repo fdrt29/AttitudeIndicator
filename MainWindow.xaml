@@ -15,7 +15,8 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
+        <local:NumericUpDown x:Name="TheNumericUpDown" />
         <!--TODO add buttons to change Raw Roll etc or set it randomly in main window code-->
-        <local:GyroHorizonView />
+        <local:GyroHorizonView Grid.Row="1" Grid.Column="0" Drift="{Binding ElementName=TheNumericUpDown, Path=Value}" />
     </Grid>
 </Window>

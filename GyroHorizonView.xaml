@@ -8,6 +8,11 @@
              d:DesignHeight="300" d:DesignWidth="300"
              x:Name="TheGyroHorizon">
     <Grid x:Name="Root">
-        <ProgressBar Background="Black" Value="{Binding ElementName=TheGyroHorizon, Path=Drift}" />
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <ProgressBar Grid.Row="1" Background="Gray" Value="{Binding ElementName=TheGyroHorizon, Path=Drift}" />
     </Grid>
 </UserControl>

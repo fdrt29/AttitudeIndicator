@@ -20,6 +20,16 @@ namespace GyroHorizon
 
         #region Dependency Properties // TODO add coerce or validate and check other
 
+        public static readonly DependencyProperty GyroHorizonDataProperty = DependencyProperty.Register(
+            "GyroHorizonData",
+            typeof(GyroHorizonData), typeof(GyroHorizonView));
+
+        public GyroHorizonData GyroHorizonData
+        {
+            get => (GyroHorizonData)GetValue(RollProperty);
+            set => SetValue(RollProperty, value);
+        }
+
         #region DependencyProperty Roll
 
         public static readonly DependencyProperty RollProperty = RollProperty = DependencyProperty.Register("Roll",
