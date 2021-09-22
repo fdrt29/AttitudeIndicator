@@ -15,8 +15,7 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        
-        <local:NumericUpDown />
-        <local:NumericUpDown Grid.Column="1" Grid.Row="0" />
+        <!--TODO add buttons to change Raw Roll etc or set it randomly in main window code-->
+        <local:GyroHorizonView />
     </Grid>
 </Window>
