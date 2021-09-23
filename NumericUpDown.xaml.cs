@@ -93,6 +93,6 @@ namespace GyroHorizon
             Value -= ValuePerTick;
         }
 
-        private decimal ValuePerTick = 5;
+        private decimal ValuePerTick = 1;
     }
 }

@@ -1,66 +1,54 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using GyroHorizon.Annotations;
 
 namespace GyroHorizon
 {
-    public partial class PitchIndicator : UserControl
+    public partial class PitchIndicator : UserControl, INotifyPropertyChanged
     {
         public PitchIndicator()
         {
             InitializeComponent();
-            Loaded += OnLoaded;
-            TheScrollViewer.PreviewMouseWheel +=
-                (object sender, MouseWheelEventArgs e) => e.Handled = true; // Disable mouse wheel for ScrollViewer
-            SizeChanged += OnSizeChanged;
         }
 
-        private void OnSizeChanged(object sender, SizeChangedEventArgs args)
+
+        private double _yOffset = 0;
+
+        public double YOffset
         {
-            ScrollProportionallyPitch(Pitch);
+            get => _yOffset;
+            set
+            {
+                _yOffset = value;
+                OnPropertyChanged();
+            }
         }
 
-        public static readonly DependencyProperty ScaleIntermediateHeightProperty = DependencyProperty.Register(
-            "ScaleIntermediateHeight", typeof(double), typeof(PitchIndicator), new PropertyMetadata(default(double)));
-
-        public double ScaleIntermediateHeight
-        {
-            get { return (double)GetValue(ScaleIntermediateHeightProperty); }
-            set { SetValue(ScaleIntermediateHeightProperty, value); }
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            TheScrollViewer.ScrollToVerticalOffset(TheScrollViewer.ScrollableHeight / 2);
-            TheScrollViewer.UpdateLayout();
-        }
-
-        private void ScrollProportionallyPitch(double pitchValue)
-        {
-            // from - 90 to 90
-            var maxValue = 90.0d;
-            var pitchPercent = pitchValue / maxValue;
-
-            var scrollableHeightHalf = TheScrollViewer.ScrollableHeight / 2;
-            var scrollOffset = scrollableHeightHalf - pitchPercent * scrollableHeightHalf;
-            TheScrollViewer.ScrollToVerticalOffset(scrollOffset);
-            TheScrollViewer.UpdateLayout();
-        }
 
         #region DependencyProperty Pitch
 
         public static readonly DependencyProperty PitchProperty = DependencyProperty.Register("Pitch", typeof(double),
             typeof(PitchIndicator),
-            new FrameworkPropertyMetadata(PitchChangedCallback));
+            new FrameworkPropertyMetadata(PitchChangedCallback, CoerceValueCallback));
+
+        private static object CoerceValueCallback(DependencyObject d, object basevalue)
+        {
+            double minValue = -90;
+            double maxValue = 90;
+            return Math.Max(minValue, Math.Min(maxValue, (double)basevalue));
+        }
 
         private static void PitchChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is PitchIndicator pitchIndicator)) return;
-
-            pitchIndicator.ScrollProportionallyPitch((double)e.NewValue);
+            // -90 to 90 = 180
+            // pitchIndicator.YOffset = pitchIndicator.ThePitchScale.ActualHeight / 180 * (double)e.NewValue;
         }
 
 
@@ -71,6 +59,14 @@ namespace GyroHorizon
         }
 
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     class HalfConverter : IValueConverter

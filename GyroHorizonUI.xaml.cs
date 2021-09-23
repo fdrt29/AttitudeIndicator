@@ -1,13 +1,16 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using GyroHorizon.Annotations;
 
 namespace GyroHorizon
 {
     public delegate void PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e);
 
-    public partial class GyroHorizonUI : UserControl
+    public partial class GyroHorizonUI : UserControl, INotifyPropertyChanged
     {
         public GyroHorizonUI()
         {
@@ -17,6 +20,18 @@ namespace GyroHorizon
 
 
         private GyroHorizonVM _vm;
+
+        private double _yOffset = 0;
+
+        public double YOffset
+        {
+            get => _yOffset;
+            set
+            {
+                _yOffset = value;
+                OnPropertyChanged();
+            }
+        }
 
 
         #region Dependency Properties // TODO add coerce or validate and check other
@@ -38,7 +53,14 @@ namespace GyroHorizon
 
         public static readonly DependencyProperty PitchProperty = DependencyProperty.Register("Pitch", typeof(double),
             typeof(GyroHorizonUI),
-            new FrameworkPropertyMetadata());
+            new FrameworkPropertyMetadata(PropertyChangedCallback));
+
+        private static void PropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (!(d is GyroHorizonUI gyroHorizonUi)) return;
+
+            gyroHorizonUi.YOffset = gyroHorizonUi.ThePitchScale.ActualHeight / 180 * gyroHorizonUi.Pitch;
+        }
 
         public double Pitch
         {
@@ -91,5 +113,13 @@ namespace GyroHorizon
         #endregion
 
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

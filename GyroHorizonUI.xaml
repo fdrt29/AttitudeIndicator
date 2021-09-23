@@ -5,9 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:GyroHorizon"
              xmlns:gyroHorizon="clr-namespace:GyroHorizon"
+             xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
-             x:Name="TheGyroHorizon">
+             x:Name="This">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -38,22 +39,71 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="Root">
-        <local:PitchIndicator x:Name="ThePitchIndicator"
-                              Pitch="{Binding RelativeSource={RelativeSource FindAncestor,
-                               AncestorType={x:Type local:GyroHorizonUI}},
-                               Path=Pitch}" />
+    <Grid x:Name="Root" ClipToBounds="False">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Rectangle Fill="Aqua" />
+            <Rectangle Grid.Row="1" Fill="Chocolate" />
+            <UniformGrid Grid.RowSpan="2" x:Name="ThePitchScale" Columns="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                         Width="{calcBinding:Binding '0.5*ActualWidth', ElementName=TheRollIndicator}"
+                         Height="{calcBinding:Binding 'ActualHeight', ElementName=This}"
+                         ClipToBounds="False">
+                <UniformGrid.RenderTransform>
+                    <TranslateTransform Y="{Binding YOffset, ElementName=This}" />
+                </UniformGrid.RenderTransform>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+                <Grid>
+                    <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
+                </Grid>
+            </UniformGrid>
+        </Grid>
 
 
-        <Image x:Name="TheRollIndicator" HorizontalAlignment="Center" VerticalAlignment="Center"
-               Source="{StaticResource AirplaneImage}"
-               Height="200"
-               Width="200"
-               RenderTransformOrigin=".5,.5">
-            <Image.RenderTransform>
-                <RotateTransform Angle="{Binding ElementName=TheGyroHorizon, Path=Roll}" />
-            </Image.RenderTransform>
-        </Image>
+        <!-- <Image x:Name="TheRollIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" -->
+        <!--        Source="{StaticResource AirplaneImage}" Margin="100" -->
+        <!--        RenderTransformOrigin=".5,.5"> -->
+        <!--     <Image.RenderTransform> -->
+        <!--         <RotateTransform Angle="{Binding ElementName=This, Path=Roll}" /> -->
+        <!--     </Image.RenderTransform> -->
+        <!-- </Image> -->
+        <Grid x:Name="TheRollIndicator" HorizontalAlignment="Center" VerticalAlignment="Center"
+              RenderTransformOrigin=".5,.5">
+            <Ellipse HorizontalAlignment="Center" Width="60" Stroke="Black" StrokeThickness="3"
+                     VerticalAlignment="Center" Height="60" />
+            <Rectangle HorizontalAlignment="Left" Height="3" Margin="0,0,100,0" Fill="Black"
+                       VerticalAlignment="Center" Width="60" />
+            <Rectangle HorizontalAlignment="Left" Height="3" Margin="100,0,0,0" Fill="Black"
+                       VerticalAlignment="Center" Width="60" />
+            <Grid.RenderTransform>
+                <RotateTransform Angle="{Binding ElementName=This, Path=Roll}" />
+            </Grid.RenderTransform>
+        </Grid>
     </Grid>
 
 

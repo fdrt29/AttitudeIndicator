@@ -11,17 +11,43 @@
             <RowDefinition Height="200" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <UniformGrid Rows="1">
-            <local:NumericUpDown x:Name="DriftInput" Label="DriftInput" />
-            <local:NumericUpDown x:Name="PitchInput" Label="PitchInput" />
-            <local:NumericUpDown x:Name="RollInput" Label="RollInput" />
-        </UniformGrid>
+        <Border>
+            <Grid Width="300" Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Yaw" VerticalAlignment="Center" />
+                <Slider Grid.Column="1" Name="SliderYaw" Minimum="-180" Maximum="180" Value="0" TickFrequency="20"
+                        TickPlacement="BottomRight" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
+                           Text="{Binding Value, ElementName=SliderYaw}" />
+
+                <TextBlock Grid.Row="1" Text="Pitch" VerticalAlignment="Center" />
+                <Slider Name="SliderPitch" Grid.Column="1" Grid.Row="1" Minimum="-90" Maximum="90" Value="0"
+                        TickFrequency="100" TickPlacement="BottomRight" VerticalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
+                           Text="{Binding Value, ElementName=SliderPitch}" />
+
+                <TextBlock Grid.Row="2" Text="Roll" VerticalAlignment="Center" />
+                <Slider Name="SliderRoll" Grid.Column="1" Grid.Row="2" Minimum="-90" Maximum="90" Value="0"
+                        TickFrequency="20" TickPlacement="BottomRight" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
+                           Text="{Binding Value, ElementName=SliderRoll}" />
+            </Grid>
+        </Border>
 
         <!--TODO add buttons to change Raw Roll etc or set it randomly in main window code-->
         <local:GyroHorizonUI Grid.Row="1" Grid.Column="0"
-                               Drift="{Binding ElementName=DriftInput, Path=Value}"
-                               Pitch="{Binding ElementName=PitchInput, Path=Value}"
-                               Roll="{Binding ElementName=RollInput, Path=Value}"
-                               />
+                             Drift="{Binding ElementName=SliderYaw, Path=Value}"
+                             Pitch="{Binding ElementName=SliderPitch, Path=Value}"
+                             Roll="{Binding ElementName=SliderRoll, Path=Value}" />
     </Grid>
 </Window>
