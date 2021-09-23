@@ -16,6 +16,7 @@ namespace GyroHorizon
         {
             InitializeComponent();
             _vm = new GyroHorizonVM(this);
+            SizeChanged += (sender, args) => YOffset = ConvertPitchToYOffset(Pitch);
         }
 
 
@@ -59,7 +60,12 @@ namespace GyroHorizon
         {
             if (!(d is GyroHorizonUI gyroHorizonUi)) return;
 
-            gyroHorizonUi.YOffset = gyroHorizonUi.ThePitchScale.ActualHeight / 180 * gyroHorizonUi.Pitch;
+            gyroHorizonUi.YOffset = gyroHorizonUi.ConvertPitchToYOffset(gyroHorizonUi.Pitch);
+        }
+
+        private double ConvertPitchToYOffset(double pitch)
+        {
+            return ThePitchScale.ActualHeight / 180 * pitch;
         }
 
         public double Pitch
