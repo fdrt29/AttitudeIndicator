@@ -51,9 +51,12 @@
             <SubType>Designer</SubType>
         </ApplicationDefinition>
         <Compile Include="Airplane.cs"/>
+        <Compile Include="PitchIndicator.xaml.cs">
+            <DependentUpon>PitchIndicator.xaml</DependentUpon>
+        </Compile>
         <Compile Include="Properties\Annotations.cs"/>
-        <Compile Include="GyroHorizonViewModel.cs"/>
-        <Page Include="GyroHorizonView.xaml"/>
+        <Compile Include="GyroHorizonVM.cs"/>
+        <Page Include="GyroHorizonUI.xaml"/>
         <Page Include="MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
             <SubType>Designer</SubType>
@@ -62,14 +65,15 @@
             <DependentUpon>App.xaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Include="GyroHorizonView.xaml.cs">
-            <DependentUpon>GyroHorizonView.xaml</DependentUpon>
+        <Compile Include="GyroHorizonUI.xaml.cs">
+            <DependentUpon>GyroHorizonUI.xaml</DependentUpon>
         </Compile>
         <Compile Include="MainWindow.xaml.cs">
             <DependentUpon>MainWindow.xaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
         <Page Include="NumericUpDown.xaml"/>
+        <Page Include="PitchIndicator.xaml"/>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="NumericUpDown.xaml.cs">

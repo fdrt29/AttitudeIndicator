@@ -1,39 +1,30 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace GyroHorizon
 {
-    public partial class GyroHorizonView : UserControl
+    public delegate void PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e);
+
+    public partial class GyroHorizonUI : UserControl
     {
-        public GyroHorizonView()
+        public GyroHorizonUI()
         {
             InitializeComponent();
-            ViewModel = new GyroHorizonViewModel();
+            _vm = new GyroHorizonVM(this);
         }
 
-        private GyroHorizonViewModel ViewModel
-        {
-            get => Root.DataContext as GyroHorizonViewModel;
-            set => Root.DataContext = value;
-        }
+
+        private GyroHorizonVM _vm;
 
 
         #region Dependency Properties // TODO add coerce or validate and check other
 
-        public static readonly DependencyProperty GyroHorizonDataProperty = DependencyProperty.Register(
-            "GyroHorizonData",
-            typeof(GyroHorizonData), typeof(GyroHorizonView));
-
-        public GyroHorizonData GyroHorizonData
-        {
-            get => (GyroHorizonData)GetValue(RollProperty);
-            set => SetValue(RollProperty, value);
-        }
-
         #region DependencyProperty Roll
 
         public static readonly DependencyProperty RollProperty = RollProperty = DependencyProperty.Register("Roll",
-            typeof(double), typeof(GyroHorizonView));
+            typeof(double), typeof(GyroHorizonUI));
 
         public double Roll
         {
@@ -46,7 +37,7 @@ namespace GyroHorizon
         #region DependencyProperty Pitch
 
         public static readonly DependencyProperty PitchProperty = DependencyProperty.Register("Pitch", typeof(double),
-            typeof(GyroHorizonView),
+            typeof(GyroHorizonUI),
             new FrameworkPropertyMetadata());
 
         public double Pitch
@@ -60,8 +51,8 @@ namespace GyroHorizon
         #region DependencyProperty Drift
 
         public static readonly DependencyProperty DriftProperty = DependencyProperty.Register("Drift", typeof(double),
-            typeof(GyroHorizonView),
-            new FrameworkPropertyMetadata());
+            typeof(GyroHorizonUI),
+            new FrameworkPropertyMetadata(0.0));
 
         public double Drift
         {
@@ -74,7 +65,7 @@ namespace GyroHorizon
         #region DependencyProperty ValidRoll
 
         public static readonly DependencyProperty ValidRollProperty = DependencyProperty.Register("ValidRoll",
-            typeof(double), typeof(GyroHorizonView),
+            typeof(double), typeof(GyroHorizonUI),
             new FrameworkPropertyMetadata());
 
         public double ValidRoll
@@ -88,7 +79,7 @@ namespace GyroHorizon
         #region DependencyProperty ValidPitch
 
         public static readonly DependencyProperty ValidPitchProperty = DependencyProperty.Register("ValidPitch",
-            typeof(double), typeof(GyroHorizonView),
+            typeof(double), typeof(GyroHorizonUI),
             new FrameworkPropertyMetadata());
 
         public double ValidPitch

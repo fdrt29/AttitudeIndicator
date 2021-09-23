@@ -4,27 +4,21 @@ using GyroHorizon.Annotations;
 
 namespace GyroHorizon
 {
-    public class GyroHorizonData
+    public class GyroHorizonVM : INotifyPropertyChanged
     {
+        public GyroHorizonVM(GyroHorizonUI view)
+        {
+            _view = view;
+        }
+
+        private GyroHorizonUI _view;
+
+
         public double Roll;
         public double Pitch;
         public double Drift;
         public double ValidRoll;
         public double ValidPitch;
-
-        public GyroHorizonData(double roll, double pitch, double drift, double validRoll, double validPitch)
-        {
-            Roll = roll;
-            Pitch = pitch;
-            Drift = drift;
-            ValidRoll = validRoll;
-            ValidPitch = validPitch;
-        }
-    }
-
-    public class GyroHorizonViewModel : INotifyPropertyChanged
-    {
-        // TODO сделать тип для обмена данными между моделью и VM
 
 
         #region INotifyPropertyChanged

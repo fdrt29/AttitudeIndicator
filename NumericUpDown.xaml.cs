@@ -15,13 +15,24 @@ namespace GyroHorizon
             InitializeComponent();
         }
 
+        public string Label
+        {
+            get => (string)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
+        }
+
+        public static readonly DependencyProperty LabelProperty =
+            DependencyProperty.Register(
+                "Label", typeof(string), typeof(NumericUpDown), new FrameworkPropertyMetadata("LabelContent"));
+
+
         /// <summary>
         /// Identifies the Value dependency property.
         /// </summary>
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register(
                 "Value", typeof(decimal), typeof(NumericUpDown),
-                new FrameworkPropertyMetadata(MinValue, new PropertyChangedCallback(OnValueChanged),
+                new FrameworkPropertyMetadata(0.0M, new PropertyChangedCallback(OnValueChanged),
                     new CoerceValueCallback(CoerceValue)));
 
         /// <summary>
@@ -35,12 +46,7 @@ namespace GyroHorizon
 
         private static object CoerceValue(DependencyObject element, object value)
         {
-            decimal newValue = (decimal)value;
-            NumericUpDown control = (NumericUpDown)element;
-
-            newValue = Math.Max(MinValue, Math.Min(MaxValue, newValue));
-
-            return newValue;
+            return value;
         }
 
         private static void OnValueChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
@@ -79,14 +85,14 @@ namespace GyroHorizon
 
         private void upButton_Click(object sender, EventArgs e)
         {
-            Value++;
+            Value += ValuePerTick;
         }
 
         private void downButton_Click(object sender, EventArgs e)
         {
-            Value--;
+            Value -= ValuePerTick;
         }
 
-        private const decimal MinValue = 0, MaxValue = 100;
+        private decimal ValuePerTick = 5;
     }
 }

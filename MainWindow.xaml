@@ -5,18 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GyroHorizon"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="600" Width="600" MinHeight="300" MinWidth="300">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition Height="200" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <local:NumericUpDown x:Name="TheNumericUpDown" />
+        <UniformGrid Rows="1">
+            <local:NumericUpDown x:Name="DriftInput" Label="DriftInput" />
+            <local:NumericUpDown x:Name="PitchInput" Label="PitchInput" />
+            <local:NumericUpDown x:Name="RollInput" Label="RollInput" />
+        </UniformGrid>
+
         <!--TODO add buttons to change Raw Roll etc or set it randomly in main window code-->
-        <local:GyroHorizonView Grid.Row="1" Grid.Column="0" Drift="{Binding ElementName=TheNumericUpDown, Path=Value}" />
+        <local:GyroHorizonUI Grid.Row="1" Grid.Column="0"
+                               Drift="{Binding ElementName=DriftInput, Path=Value}"
+                               Pitch="{Binding ElementName=PitchInput, Path=Value}"
+                               Roll="{Binding ElementName=RollInput, Path=Value}"
+                               />
     </Grid>
 </Window>

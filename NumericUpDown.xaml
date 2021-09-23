@@ -5,38 +5,41 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:GyroHorizon"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Margin="3">
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
-        <Border BorderThickness="1" BorderBrush="Gray" Margin="2"
-                Grid.RowSpan="2" VerticalAlignment="Center" HorizontalAlignment="Stretch">
-
-            <!--Bind the TextBlock to the Value property-->
-            <TextBlock
-                Width="60" TextAlignment="Right" Padding="5"
-                Text="{Binding RelativeSource={RelativeSource FindAncestor, 
+             d:DesignHeight="100" d:DesignWidth="300">
+    <Border Padding="5">
+        <DockPanel>
+            <Label DockPanel.Dock="Top" HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Margin="5"
+                   FontSize="12"
+                   Content="{Binding RelativeSource={RelativeSource FindAncestor, 
                                AncestorType={x:Type local:NumericUpDown}}, 
+                               Path=Label}" />
+            
+            <DockPanel Dock="Bottom">
+                <Border DockPanel.Dock="Top" BorderThickness="1" BorderBrush="Gray" Margin="2"
+                        VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <TextBlock TextAlignment="Right" Padding="5"
+                               Text="{Binding RelativeSource={RelativeSource FindAncestor,
+                               AncestorType={x:Type local:NumericUpDown}},
                                Path=Value}" />
+                </Border>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <RepeatButton Name="upButton" Click="upButton_Click" Grid.Column="0">
+                        Up
+                    </RepeatButton>
+                    <RepeatButton Name="downButton" Click="downButton_Click" Grid.Column="1">
+                        Down
+                    </RepeatButton>
+                </Grid>
+            </DockPanel>
+            
+        </DockPanel>
+    </Border>
 
-        </Border>
-
-        <RepeatButton Name="upButton" Click="upButton_Click"
-                      Grid.Column="1" Grid.Row="0">
-            Up
-        </RepeatButton>
-
-        <RepeatButton Name="downButton" Click="downButton_Click"
-                      Grid.Column="1" Grid.Row="1">
-            Down
-        </RepeatButton>
-
-    </Grid>
 </UserControl>
