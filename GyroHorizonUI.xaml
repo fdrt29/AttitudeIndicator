@@ -12,10 +12,16 @@
 
     <Grid x:Name="Root" ClipToBounds="True">
         <!--Pitch Scale-->
-        <Canvas x:Name="ThePitchScale" Grid.RowSpan="2"
+        <Canvas x:Name="ThePitchScale"
                 VerticalAlignment="Center" HorizontalAlignment="Center"
                 Width="{calcBinding:Binding '0.5*ActualWidth', ElementName=TheRollIndicator}"
                 Height="{calcBinding:Binding '2*ActualHeight', ElementName=This}" />
+
+        <!--Roll Scale-->
+        <Canvas x:Name="TheRollScale"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Width="{Binding ActualWidth, ElementName=This}"
+                Height="{Binding ActualHeight, ElementName=This}" />
 
         <!--Roll Indicator-->
         <Grid x:Name="TheRollIndicator" HorizontalAlignment="Center" VerticalAlignment="Center"

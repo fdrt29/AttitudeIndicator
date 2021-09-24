@@ -61,25 +61,20 @@ namespace GyroHorizon
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             DrawPitchScale();
+            DrawRollScale();
         }
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs args)
         {
             YOffset = ConvertPitchToYOffset(Pitch);
             DrawPitchScale();
+            DrawRollScale();
         }
 
-        private void DrawPitchScale()
+        private void DrawBackground()
         {
-            ThePitchScale.Children.Clear();
-
             var pitchHeightCenter = ThePitchScale.ActualHeight / 2;
             var pitchWidthCenter = ThePitchScale.ActualWidth / 2;
-            double lineWidth = ThePitchScale.ActualWidth;
-
-            int scaleStartFrom = -90;
-            int scaleEndAt = 90;
-            int scaleStep = 10;
 
             // Draw Background
             var skyRectHeight = 2 * pitchHeightCenter;
@@ -96,26 +91,66 @@ namespace GyroHorizon
             };
             Canvas.SetTop(groundRect, skyRectHeight / 2 + YOffset);
             Canvas.SetLeft(groundRect, pitchWidthCenter - ActualWidth / 2);
+
             ThePitchScale.Children.Add(skyRect);
             ThePitchScale.Children.Add(groundRect);
+        }
+
+        private void DrawPitchScale()
+        {
+            ThePitchScale.Children.Clear();
+
+            var scaleHeightCenter = ThePitchScale.ActualHeight / 2;
+            var scaleWidthCenter = ThePitchScale.ActualWidth / 2;
+            double lineWidth = ThePitchScale.ActualWidth; // From XAML
+
+            var marksColor = Brushes.Black;
+
+            int scaleStartAt = -90;
+            int scaleEndAt = 90;
+            int scaleStep = 10;
+            int marksQuantity = (scaleEndAt - scaleStartAt) / scaleStep + 1;
+
+            DrawBackground();
+
+            double textXOffset = lineWidth;
+            // Distance between scale marks * coefficient
+            int textSize = Convert.ToInt32(ThePitchScale.ActualHeight / marksQuantity * 0.6);
+            textSize = textSize == 0 ? 12 : textSize; // if ActualHeight == 0 (on init) set some default size
+
 
             // Draw Scale Marking
-            for (int i = scaleStartFrom; i <= scaleEndAt; i += scaleStep)
+            for (int i = scaleStartAt; i <= scaleEndAt; i += scaleStep)
             {
                 Rectangle rectDozenLine = new Rectangle
                 {
-                    Fill = Brushes.Black, Height = LineThickness, Width = lineWidth
+                    Fill = marksColor, Height = LineThickness, Width = lineWidth
                 };
 
-                var yOffset = pitchHeightCenter + ConvertPitchToYOffset(i) + YOffset;
+                var yOffset = scaleHeightCenter + ConvertPitchToYOffset(i) + YOffset;
 
                 Canvas.SetTop(rectDozenLine, yOffset - LineThickness / 2);
                 ThePitchScale.Children.Add(rectDozenLine);
 
-                if (i <= scaleStartFrom) continue;
+                // Numbering of marks
+                TextBlock textR = new TextBlock
+                {
+                    // Canvas doesn't support TextAlignment -> space or minus
+                    Text = -i < 0 ? (-i).ToString() : " " + (-i), // and inverting i
+                    Foreground = marksColor,
+                    FontSize = textSize,
+                    RenderTransformOrigin = new Point(0.5, 0.5),
+                };
+
+                Canvas.SetTop(textR, yOffset - textSize);
+                Canvas.SetLeft(textR, scaleWidthCenter + textXOffset);
+                ThePitchScale.Children.Add(textR);
+
+
+                if (i <= scaleStartAt) continue;
                 Rectangle rectHalfLine = new Rectangle
                 {
-                    Fill = Brushes.Black, Height = LineThickness, Width = lineWidth / 2
+                    Fill = marksColor, Height = LineThickness, Width = lineWidth / 2
                 };
                 yOffset -= ConvertPitchToYOffset(scaleStep / 2.0);
                 Canvas.SetTop(rectHalfLine, yOffset - LineThickness / 2);
@@ -125,13 +160,66 @@ namespace GyroHorizon
 
             Rectangle centerLine = new Rectangle
             {
-                Fill = Brushes.Black, Height = 1, Width = 3 * lineWidth
+                Fill = marksColor, Height = 1, Width = 3 * lineWidth
             };
-            Canvas.SetTop(centerLine, pitchHeightCenter);
-            Canvas.SetLeft(centerLine, pitchWidthCenter - centerLine.Width / 2);
+            Canvas.SetTop(centerLine, scaleHeightCenter);
+            Canvas.SetLeft(centerLine, scaleWidthCenter - centerLine.Width / 2);
             ThePitchScale.Children.Add(centerLine);
 
             ThePitchScale.InvalidateVisual(); // Force the canvas to refresh
+        }
+
+        void DrawRollScale()
+        {
+            TheRollScale.Children.Clear();
+
+            var scaleCenter = new Point(TheRollScale.ActualWidth / 2, TheRollScale.ActualHeight / 2);
+            var radius = Math.Max(TheRollScale.ActualWidth, TheRollScale.ActualHeight) / 4;
+
+            int scaleStartAt = -90;
+            int scaleEndAt = 90;
+            int scaleStep = 10;
+
+            var marksColor = Brushes.Black;
+
+            Point startPoint = new Point(scaleCenter.X - radius, scaleCenter.Y);
+            Point endPoint = new Point(scaleCenter.X + radius, scaleCenter.Y);
+            // Semicircle
+            ArcSegment arcSegment = new ArcSegment(endPoint, new Size(radius, radius), 0, false,
+                SweepDirection.Clockwise, true);
+            PathGeometry geometry =
+                new PathGeometry(new[] { new PathFigure(startPoint, new[] { arcSegment }, false) });
+            Path path = new Path
+            {
+                Data = geometry,
+                Stroke = marksColor,
+                StrokeThickness = LineThickness,
+            };
+            TheRollScale.Children.Add(path);
+
+            double lineLength = radius / 6.0;
+            // Draw Scale Marking
+            for (int i = scaleStartAt; i <= scaleEndAt; i += scaleStep)
+            {
+                double angle = i - 90.0; // Rotate
+                angle = Math.PI * angle / 180.0; // To radians
+
+                var xCoord = Math.Cos(angle) * radius;
+                var yCoord = Math.Sin(angle) * radius;
+                var xCoordEnd = Math.Cos(angle) * (radius - lineLength);
+                var yCoordEnd = Math.Sin(angle) * (radius - lineLength);
+
+                Line line = new Line
+                {
+                    X1 = xCoord, Y1 = yCoord, X2 = xCoordEnd, Y2 = yCoordEnd,
+                    StrokeThickness = LineThickness, Stroke = marksColor,
+                };
+                Canvas.SetTop(line, scaleCenter.Y);
+                Canvas.SetLeft(line, scaleCenter.X);
+                TheRollScale.Children.Add(line);
+            }
+
+            TheRollScale.InvalidateVisual();
         }
 
 
@@ -248,6 +336,8 @@ namespace GyroHorizon
 
         #endregion
 
+        #region INotifyPropertyChanged
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -255,5 +345,7 @@ namespace GyroHorizon
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion
     }
 }
