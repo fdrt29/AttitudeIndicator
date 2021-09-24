@@ -22,17 +22,19 @@
                     <RowDefinition Height="40" />
                     <RowDefinition Height="40" />
                     <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Text="Yaw" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Name="SliderYaw" Minimum="-180" Maximum="180" Value="0" TickFrequency="20"
+                <TextBlock Text="Drift" VerticalAlignment="Center" />
+                <Slider Grid.Column="1" Name="SliderDrift" Minimum="-180" Maximum="180" Value="0" TickFrequency="20"
                         TickPlacement="BottomRight" VerticalAlignment="Center" />
                 <TextBlock Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
-                           Text="{Binding Value, ElementName=SliderYaw}" />
+                           Text="{Binding Value, ElementName=SliderDrift}" />
 
                 <TextBlock Grid.Row="1" Text="Pitch" VerticalAlignment="Center" />
                 <Slider Name="SliderPitch" Grid.Column="1" Grid.Row="1" Minimum="-90" Maximum="90" Value="0"
-                        TickFrequency="100" TickPlacement="BottomRight" VerticalAlignment="Center"/>
+                        TickFrequency="100" TickPlacement="BottomRight" VerticalAlignment="Center" />
                 <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
                            Text="{Binding Value, ElementName=SliderPitch}" />
 
@@ -41,13 +43,26 @@
                         TickFrequency="20" TickPlacement="BottomRight" VerticalAlignment="Center" />
                 <TextBlock Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
                            Text="{Binding Value, ElementName=SliderRoll}" />
+
+                <TextBlock Grid.Row="3" Text="ValidPitch" VerticalAlignment="Center" />
+                <Slider Name="SliderValidPitch" Grid.Column="1" Grid.Row="3" Minimum="0" Maximum="90" Value="0"
+                        TickFrequency="20" TickPlacement="BottomRight" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
+                           Text="{Binding Value, ElementName=SliderValidPitch}" />
+
+                <TextBlock Grid.Row="4" Text="ValidRoll" VerticalAlignment="Center" />
+                <Slider Name="SliderValidRoll" Grid.Column="1" Grid.Row="4" Minimum="0" Maximum="90" Value="0"
+                        TickFrequency="20" TickPlacement="BottomRight" VerticalAlignment="Center" />
+                <TextBlock Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
+                           Text="{Binding Value, ElementName=SliderValidRoll}" />
             </Grid>
         </Border>
 
-        <!--TODO add buttons to change Raw Roll etc or set it randomly in main window code-->
         <local:GyroHorizonUI Grid.Row="1" Grid.Column="0"
-                             Drift="{Binding ElementName=SliderYaw, Path=Value}"
+                             Drift="{Binding ElementName=SliderDrift, Path=Value}"
                              Pitch="{Binding ElementName=SliderPitch, Path=Value}"
-                             Roll="{Binding ElementName=SliderRoll, Path=Value}" />
+                             Roll="{Binding ElementName=SliderRoll, Path=Value}"
+                             ValidRoll="{Binding ElementName=SliderValidRoll, Path=Value}"
+                             ValidPitch="{Binding ElementName=SliderValidPitch, Path=Value}" />
     </Grid>
 </Window>

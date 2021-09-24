@@ -10,36 +10,8 @@
              d:DesignHeight="400" d:DesignWidth="300"
              x:Name="This">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <DrawingImage x:Key="AirplaneImage">
-                <DrawingImage.Drawing>
-                    <DrawingGroup>
-                        <DrawingGroup.Children>
-                            <GeometryDrawing Brush="#FFFFFFFF" Geometry="F1 M -6.35783e-007,16L 12.6335,16">
-                                <GeometryDrawing.Pen>
-                                    <Pen LineJoin="Round" Brush="#FF000000" />
-                                </GeometryDrawing.Pen>
-                            </GeometryDrawing>
-                            <GeometryDrawing Brush="#FFFFFFFF"
-                                             Geometry="F1 M 15.9834,19.3299C 17.8224,19.3299 19.3132,17.839 19.3132,16C 19.3132,14.1609 17.8224,12.6701 15.9834,12.6701C 14.1443,12.6701 12.6535,14.1609 12.6535,16C 12.6535,17.839 14.1443,19.3299 15.9834,19.3299 Z ">
-                                <GeometryDrawing.Pen>
-                                    <Pen LineJoin="Round" Brush="#FF000000" />
-                                </GeometryDrawing.Pen>
-                            </GeometryDrawing>
-                            <GeometryDrawing Brush="#FFFFFFFF" Geometry="F1 M 32,16L 19.2933,16">
-                                <GeometryDrawing.Pen>
-                                    <Pen LineJoin="Round" Brush="#FF000000" />
-                                </GeometryDrawing.Pen>
-                            </GeometryDrawing>
-                        </DrawingGroup.Children>
-                    </DrawingGroup>
-                </DrawingImage.Drawing>
-            </DrawingImage>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
     <Grid x:Name="Root" ClipToBounds="True">
+        <!--Background-->
         <Grid Height="{calcBinding:Binding 'ActualHeight', ElementName=This}">
             <Grid.Background>
                 <LinearGradientBrush MappingMode="Absolute">
@@ -52,6 +24,8 @@
                 </LinearGradientBrush>
             </Grid.Background>
         </Grid>
+
+        <!--Pitch Scale-->
         <UniformGrid Grid.RowSpan="2" x:Name="ThePitchScale" Columns="1" VerticalAlignment="Center"
                      HorizontalAlignment="Center"
                      Width="{calcBinding:Binding '0.5*ActualWidth', ElementName=TheRollIndicator}"
@@ -98,51 +72,51 @@
         </UniformGrid>
 
 
-        <!-- <Image x:Name="TheRollIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" -->
-        <!--        Source="{StaticResource AirplaneImage}" Margin="100" -->
-        <!--        RenderTransformOrigin=".5,.5"> -->
-        <!--     <Image.RenderTransform> -->
-        <!--         <RotateTransform Angle="{Binding ElementName=This, Path=Roll}" /> -->
-        <!--     </Image.RenderTransform> -->
-        <!-- </Image> -->
+        <!--Roll Indicator-->
         <Grid x:Name="TheRollIndicator" HorizontalAlignment="Center" VerticalAlignment="Center"
               RenderTransformOrigin=".5,.5">
-            <Ellipse HorizontalAlignment="Center" Width="60" Stroke="Black" StrokeThickness="3"
-                     VerticalAlignment="Center" Height="60" />
+
+            <Grid.RenderTransform>
+                <RotateTransform Angle="{Binding ElementName=This, Path=Roll}" />
+            </Grid.RenderTransform>
+
+            <!--Flashing animation-->
+            <Grid.Style>
+                <Style TargetType="{x:Type Grid}">
+                    <Style.Resources>
+                        <Storyboard x:Key="FlashAnimation">
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" AutoReverse="True"
+                                             Duration="0:0:0.5" RepeatBehavior="Forever" />
+                        </Storyboard>
+                    </Style.Resources>
+
+                    <Style.Triggers>
+                        <DataTrigger
+                            Binding="{calcBinding:Binding 'PitchExcess || RollExcess',
+                            ElementName=This}"
+                            Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard Name="flash" Storyboard="{StaticResource FlashAnimation}" />
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="flash" />
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <!--Visual-->
+            <Ellipse HorizontalAlignment="Center" Width="50" Stroke="Black" StrokeThickness="3"
+                     VerticalAlignment="Center" Height="50" />
             <Rectangle HorizontalAlignment="Left" Height="3" Margin="0,0,100,0" Fill="Black"
                        VerticalAlignment="Center" Width="60" />
             <Rectangle HorizontalAlignment="Left" Height="3" Margin="100,0,0,0" Fill="Black"
                        VerticalAlignment="Center" Width="60" />
-            <Grid.RenderTransform>
-                <RotateTransform Angle="{Binding ElementName=This, Path=Roll}" />
-            </Grid.RenderTransform>
+
         </Grid>
     </Grid>
-
-
-    <!--<Grid x:Name="Root">
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        
-        <ProgressBar Grid.Row="0" Width="40" Orientation="Vertical"
-                     Value="{Binding ElementName=TheGyroHorizon, Path=Pitch }" />
-        <ProgressBar Grid.Row="1" Height="40" Value="{Binding ElementName=TheGyroHorizon, Path=Drift}" />
-        
-        
-        <Image x:Name="TheRollIndicator" HorizontalAlignment="Center" Grid.Row="2"
-               Source="{StaticResource AirplaneImage}"
-               Height="200"
-               Width="200"
-               RenderTransformOrigin=".5,.5">
-            <Image.RenderTransform>
-                <RotateTransform Angle="{Binding ElementName=TheGyroHorizon, Path=Roll}" />
-            </Image.RenderTransform>
-        </Image>
-
-
-    </Grid>-->
 
 </UserControl>
