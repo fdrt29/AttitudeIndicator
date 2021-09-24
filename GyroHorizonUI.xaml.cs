@@ -71,6 +71,8 @@ namespace GyroHorizon
 
         private void DrawPitchScale()
         {
+            ThePitchScale.Children.Clear();
+
             var pitchHeightCenter = ThePitchScale.ActualHeight / 2;
             var pitchWidthCenter = ThePitchScale.ActualWidth / 2;
             double lineWidth = ThePitchScale.ActualWidth;
@@ -79,7 +81,25 @@ namespace GyroHorizon
             int scaleEndAt = 90;
             int scaleStep = 10;
 
-            ThePitchScale.Children.Clear();
+            // Draw Background
+            var skyRectHeight = 2 * pitchHeightCenter;
+            Rectangle skyRect = new Rectangle
+            {
+                Fill = Brushes.SkyBlue, Height = skyRectHeight, Width = ActualWidth
+            };
+            Canvas.SetTop(skyRect, -skyRectHeight / 2 + YOffset);
+            Canvas.SetLeft(skyRect, pitchWidthCenter - ActualWidth / 2);
+
+            Rectangle groundRect = new Rectangle
+            {
+                Fill = Brushes.SaddleBrown, Height = skyRectHeight, Width = ActualWidth
+            };
+            Canvas.SetTop(groundRect, skyRectHeight / 2 + YOffset);
+            Canvas.SetLeft(groundRect, pitchWidthCenter - ActualWidth / 2);
+            ThePitchScale.Children.Add(skyRect);
+            ThePitchScale.Children.Add(groundRect);
+
+            // Draw Scale Marking
             for (int i = scaleStartFrom; i <= scaleEndAt; i += scaleStep)
             {
                 Rectangle rectDozenLine = new Rectangle
@@ -110,6 +130,7 @@ namespace GyroHorizon
             Canvas.SetTop(centerLine, pitchHeightCenter);
             Canvas.SetLeft(centerLine, pitchWidthCenter - centerLine.Width / 2);
             ThePitchScale.Children.Add(centerLine);
+
             ThePitchScale.InvalidateVisual(); // Force the canvas to refresh
         }
 
