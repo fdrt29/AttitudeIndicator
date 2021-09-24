@@ -26,51 +26,10 @@
         </Grid>
 
         <!--Pitch Scale-->
-        <UniformGrid Grid.RowSpan="2" x:Name="ThePitchScale" Columns="1" VerticalAlignment="Center"
-                     HorizontalAlignment="Center"
-                     Width="{calcBinding:Binding '0.5*ActualWidth', ElementName=TheRollIndicator}"
-                     Height="{calcBinding:Binding 'ActualHeight', ElementName=This}">
-            <UniformGrid.RenderTransform>
-                <TranslateTransform Y="{Binding YOffset, ElementName=This}" />
-            </UniformGrid.RenderTransform>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Top" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-            </Grid>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Top" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-            </Grid>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Top" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-            </Grid>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Top" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-            </Grid>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Top" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-            </Grid>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Top" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-            </Grid>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Top" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-            </Grid>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Top" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-            </Grid>
-            <Grid>
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Center" />
-                <Rectangle Fill="Black" Height="3" VerticalAlignment="Bottom" />
-            </Grid>
-        </UniformGrid>
-
+        <Canvas x:Name="ThePitchScale" Grid.RowSpan="2"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Width="{calcBinding:Binding '0.5*ActualWidth', ElementName=TheRollIndicator}"
+                Height="{calcBinding:Binding '2*ActualHeight', ElementName=This}" />
 
         <!--Roll Indicator-->
         <Grid x:Name="TheRollIndicator" HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -80,7 +39,7 @@
                 <RotateTransform Angle="{Binding ElementName=This, Path=Roll}" />
             </Grid.RenderTransform>
 
-            <!--Flashing animation-->
+            <!--Roll Indicator : Flashing animation-->
             <Grid.Style>
                 <Style TargetType="{x:Type Grid}">
                     <Style.Resources>
@@ -108,7 +67,7 @@
                 </Style>
             </Grid.Style>
 
-            <!--Visual-->
+            <!--Roll Indicator : Visual-->
             <Ellipse HorizontalAlignment="Center" Width="50" Stroke="Black" StrokeThickness="3"
                      VerticalAlignment="Center" Height="50" />
             <Rectangle HorizontalAlignment="Left" Height="3" Margin="0,0,100,0" Fill="Black"

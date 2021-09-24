@@ -3,19 +3,20 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using GyroHorizon.Annotations;
 
 namespace GyroHorizon
 {
-    public delegate void PropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e);
-
     public partial class GyroHorizonUI : UserControl, INotifyPropertyChanged
     {
         public GyroHorizonUI()
         {
             InitializeComponent();
             _vm = new GyroHorizonVM(this);
-            SizeChanged += (sender, args) => YOffset = ConvertPitchToYOffset(Pitch);
+            SizeChanged += OnSizeChanged;
+            Loaded += OnLoaded;
         }
 
 
@@ -54,6 +55,64 @@ namespace GyroHorizon
             }
         }
 
+        private double LineThickness => 3;
+
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            DrawPitchScale();
+        }
+
+        private void OnSizeChanged(object sender, SizeChangedEventArgs args)
+        {
+            YOffset = ConvertPitchToYOffset(Pitch);
+            DrawPitchScale();
+        }
+
+        private void DrawPitchScale()
+        {
+            var pitchHeightCenter = ThePitchScale.ActualHeight / 2;
+            var pitchWidthCenter = ThePitchScale.ActualWidth / 2;
+            double lineWidth = ThePitchScale.ActualWidth;
+
+            int scaleStartFrom = -90;
+            int scaleEndAt = 90;
+            int scaleStep = 10;
+
+            ThePitchScale.Children.Clear();
+            for (int i = scaleStartFrom; i <= scaleEndAt; i += scaleStep)
+            {
+                Rectangle rectDozenLine = new Rectangle
+                {
+                    Fill = Brushes.Black, Height = LineThickness, Width = lineWidth
+                };
+
+                var yOffset = pitchHeightCenter + ConvertPitchToYOffset(i) + YOffset;
+
+                Canvas.SetTop(rectDozenLine, yOffset - LineThickness / 2);
+                ThePitchScale.Children.Add(rectDozenLine);
+
+                if (i <= scaleStartFrom) continue;
+                Rectangle rectHalfLine = new Rectangle
+                {
+                    Fill = Brushes.Black, Height = LineThickness, Width = lineWidth / 2
+                };
+                yOffset -= ConvertPitchToYOffset(scaleStep / 2.0);
+                Canvas.SetTop(rectHalfLine, yOffset - LineThickness / 2);
+                Canvas.SetLeft(rectHalfLine, lineWidth / 4); // to horizontal center
+                ThePitchScale.Children.Add(rectHalfLine);
+            }
+
+            Rectangle centerLine = new Rectangle
+            {
+                Fill = Brushes.Black, Height = 1, Width = 3 * lineWidth
+            };
+            Canvas.SetTop(centerLine, pitchHeightCenter);
+            Canvas.SetLeft(centerLine, pitchWidthCenter - centerLine.Width / 2);
+            ThePitchScale.Children.Add(centerLine);
+            ThePitchScale.InvalidateVisual(); // Force the canvas to refresh
+        }
+
 
         #region Dependency Properties // TODO add coerce or validate and check other
 
@@ -64,17 +123,17 @@ namespace GyroHorizon
 
         private static void RollChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //TODO value if > ValidRoll call some
-            if (!(d is GyroHorizonUI gyroHorizonUi)) return;
+            if (!(d is GyroHorizonUI gyro)) return;
             if (!double.TryParse(e.NewValue.ToString(), out double value)) return;
 
-            if (Math.Abs(value) > gyroHorizonUi.ValidRoll && gyroHorizonUi.RollExcess == false)
+            // TODO extract to method
+            if (Math.Abs(value) > gyro.ValidRoll && gyro.RollExcess == false)
             {
-                gyroHorizonUi.RollExcess = true;
+                gyro.RollExcess = true;
             }
-            else if (gyroHorizonUi.RollExcess == true && Math.Abs(value) <= gyroHorizonUi.ValidRoll)
+            else if (gyro.RollExcess == true && Math.Abs(value) <= gyro.ValidRoll)
             {
-                gyroHorizonUi.RollExcess = false;
+                gyro.RollExcess = false;
             }
         }
 
@@ -94,24 +153,26 @@ namespace GyroHorizon
 
         private static void PitchChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!(d is GyroHorizonUI gyroHorizonUi)) return;
+            if (!(d is GyroHorizonUI gyro)) return;
             if (!double.TryParse(e.NewValue.ToString(), out double value)) return;
 
-            if (Math.Abs(value) > gyroHorizonUi.ValidPitch && gyroHorizonUi.PitchExcess == false)
+            if (Math.Abs(value) > gyro.ValidPitch && gyro.PitchExcess == false)
             {
-                gyroHorizonUi.PitchExcess = true;
+                gyro.PitchExcess = true;
             }
-            else if (gyroHorizonUi.PitchExcess == true && Math.Abs(value) <= gyroHorizonUi.ValidPitch)
+            else if (gyro.PitchExcess == true && Math.Abs(value) <= gyro.ValidPitch)
             {
-                gyroHorizonUi.PitchExcess = false;
+                gyro.PitchExcess = false;
             }
 
-            gyroHorizonUi.YOffset = gyroHorizonUi.ConvertPitchToYOffset(gyroHorizonUi.Pitch);
+            gyro.YOffset = gyro.ConvertPitchToYOffset(gyro.Pitch);
+
+            gyro.DrawPitchScale();
         }
 
         private double ConvertPitchToYOffset(double pitch)
         {
-            return ThePitchScale.ActualHeight / 180 * pitch;
+            return ThePitchScale.ActualHeight / 180 * pitch; // from -90 to +90 = 180
         }
 
         public double Pitch
