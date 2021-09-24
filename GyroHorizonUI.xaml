@@ -16,6 +16,7 @@
                 VerticalAlignment="Center" HorizontalAlignment="Center"
                 Width="{calcBinding:Binding '0.5*ActualWidth', ElementName=TheRollIndicator}"
                 Height="{calcBinding:Binding '2*ActualHeight', ElementName=This}" />
+        <!--TODO mb make background as separate element (grid)-->
 
         <!--Roll Scale-->
         <Canvas x:Name="TheRollScale"

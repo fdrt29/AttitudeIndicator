@@ -24,6 +24,19 @@ namespace GyroHorizon
         private double _yOffset;
         private bool _rollExcess;
         private bool _pitchExcess;
+        private SolidColorBrush _marksColor = Brushes.Black;
+
+        public SolidColorBrush MarksColor
+        {
+            get => _marksColor;
+            private set
+            {
+                if (Equals(value, _marksColor)) return;
+                _marksColor = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         public double YOffset
         {
@@ -48,7 +61,7 @@ namespace GyroHorizon
         public bool PitchExcess
         {
             get => _pitchExcess;
-            set
+            private set
             {
                 _pitchExcess = value;
                 OnPropertyChanged();
@@ -99,12 +112,11 @@ namespace GyroHorizon
         private void DrawPitchScale()
         {
             ThePitchScale.Children.Clear();
+            // TODO doesnt clear but iterate and update
 
             var scaleHeightCenter = ThePitchScale.ActualHeight / 2;
             var scaleWidthCenter = ThePitchScale.ActualWidth / 2;
             double lineWidth = ThePitchScale.ActualWidth; // From XAML
-
-            var marksColor = Brushes.Black;
 
             int scaleStartAt = -90;
             int scaleEndAt = 90;
@@ -124,7 +136,7 @@ namespace GyroHorizon
             {
                 Rectangle rectDozenLine = new Rectangle
                 {
-                    Fill = marksColor, Height = LineThickness, Width = lineWidth
+                    Fill = MarksColor, Height = LineThickness, Width = lineWidth
                 };
 
                 var yOffset = scaleHeightCenter + ConvertPitchToYOffset(i) + YOffset;
@@ -137,7 +149,7 @@ namespace GyroHorizon
                 {
                     // Canvas doesn't support TextAlignment -> space or minus
                     Text = -i < 0 ? (-i).ToString() : " " + (-i), // and inverting i
-                    Foreground = marksColor,
+                    Foreground = MarksColor,
                     FontSize = textSize,
                     RenderTransformOrigin = new Point(0.5, 0.5),
                 };
@@ -150,7 +162,7 @@ namespace GyroHorizon
                 if (i <= scaleStartAt) continue;
                 Rectangle rectHalfLine = new Rectangle
                 {
-                    Fill = marksColor, Height = LineThickness, Width = lineWidth / 2
+                    Fill = MarksColor, Height = LineThickness, Width = lineWidth / 2
                 };
                 yOffset -= ConvertPitchToYOffset(scaleStep / 2.0);
                 Canvas.SetTop(rectHalfLine, yOffset - LineThickness / 2);
@@ -160,7 +172,7 @@ namespace GyroHorizon
 
             Rectangle centerLine = new Rectangle
             {
-                Fill = marksColor, Height = 1, Width = 3 * lineWidth
+                Fill = MarksColor, Height = 1, Width = 3 * lineWidth
             };
             Canvas.SetTop(centerLine, scaleHeightCenter);
             Canvas.SetLeft(centerLine, scaleWidthCenter - centerLine.Width / 2);
@@ -172,6 +184,7 @@ namespace GyroHorizon
         void DrawRollScale()
         {
             TheRollScale.Children.Clear();
+            // TODO doesnt clear but iterate and update
 
             var scaleCenter = new Point(TheRollScale.ActualWidth / 2, TheRollScale.ActualHeight / 2);
             var radius = Math.Max(TheRollScale.ActualWidth, TheRollScale.ActualHeight) / 4;
@@ -179,8 +192,6 @@ namespace GyroHorizon
             int scaleStartAt = -90;
             int scaleEndAt = 90;
             int scaleStep = 10;
-
-            var marksColor = Brushes.Black;
 
             Point startPoint = new Point(scaleCenter.X - radius, scaleCenter.Y);
             Point endPoint = new Point(scaleCenter.X + radius, scaleCenter.Y);
@@ -192,11 +203,15 @@ namespace GyroHorizon
             Path path = new Path
             {
                 Data = geometry,
-                Stroke = marksColor,
+                Stroke = MarksColor,
                 StrokeThickness = LineThickness,
             };
             TheRollScale.Children.Add(path);
 
+            var textSize = Math.PI * radius / 18 / 2;
+            textSize = textSize == 0 ? 12 : textSize; // if ActualHeight == 0 (on init) set some default size
+
+            // Arc length
             double lineLength = radius / 6.0;
             // Draw Scale Marking
             for (int i = scaleStartAt; i <= scaleEndAt; i += scaleStep)
@@ -212,18 +227,30 @@ namespace GyroHorizon
                 Line line = new Line
                 {
                     X1 = xCoord, Y1 = yCoord, X2 = xCoordEnd, Y2 = yCoordEnd,
-                    StrokeThickness = LineThickness, Stroke = marksColor,
+                    StrokeThickness = LineThickness, Stroke = MarksColor,
                 };
                 Canvas.SetTop(line, scaleCenter.Y);
                 Canvas.SetLeft(line, scaleCenter.X);
                 TheRollScale.Children.Add(line);
+
+
+                xCoordEnd = Math.Cos(angle) * (radius + lineLength / 2);
+                yCoordEnd = Math.Sin(angle) * (radius + lineLength / 2);
+                TextBlock text = new TextBlock
+                {
+                    Text = i < 0 ? i.ToString() : " " + i, // minus or space
+                    FontSize = textSize,
+                };
+                Canvas.SetTop(text, scaleCenter.Y + yCoordEnd - textSize);
+                Canvas.SetLeft(text, scaleCenter.X + xCoordEnd - textSize);
+                TheRollScale.Children.Add(text);
             }
 
             TheRollScale.InvalidateVisual();
         }
 
 
-        #region Dependency Properties // TODO add coerce or validate and check other
+        #region Dependency Properties
 
         #region DependencyProperty Roll
 
