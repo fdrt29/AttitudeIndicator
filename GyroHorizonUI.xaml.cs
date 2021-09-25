@@ -11,20 +11,19 @@ namespace GyroHorizon
 {
     public partial class GyroHorizonUI : UserControl, INotifyPropertyChanged
     {
+        private double _driftXOffset;
+        private SolidColorBrush _marksColor = Brushes.Black;
+        private bool _pitchExcess;
+        private double _pitchYOffset;
+        private bool _rollExcess;
+        private double _rollScaleRadius;
+
         public GyroHorizonUI()
         {
             InitializeComponent();
             SizeChanged += OnSizeChanged;
             Loaded += OnLoaded;
         }
-
-
-        private double _pitchYOffset;
-        private bool _rollExcess;
-        private bool _pitchExcess;
-        private SolidColorBrush _marksColor = Brushes.Black;
-        private double _driftXOffset;
-        private double _rollScaleRadius;
 
 
         public SolidColorBrush MarksColor
@@ -119,14 +118,14 @@ namespace GyroHorizon
 
             // Draw Background
             var skyRectHeight = 2 * pitchHeightCenter;
-            Rectangle skyRect = new Rectangle
+            var skyRect = new Rectangle
             {
                 Fill = Brushes.SkyBlue, Height = skyRectHeight, Width = ActualWidth
             };
             Canvas.SetTop(skyRect, -skyRectHeight / 2 + PitchYOffset);
             Canvas.SetLeft(skyRect, pitchWidthCenter - ActualWidth / 2);
 
-            Rectangle groundRect = new Rectangle
+            var groundRect = new Rectangle
             {
                 Fill = Brushes.SaddleBrown, Height = skyRectHeight, Width = ActualWidth
             };
@@ -144,25 +143,25 @@ namespace GyroHorizon
 
             var scaleHeightCenter = ThePitchScale.ActualHeight / 2;
             var scaleWidthCenter = ThePitchScale.ActualWidth / 2;
-            double lineWidth = ThePitchScale.ActualWidth; // From XAML
+            var lineWidth = ThePitchScale.ActualWidth; // From XAML
 
-            int scaleStartAt = -90;
-            int scaleEndAt = 90;
-            int scaleStep = 10;
-            int marksQuantity = (scaleEndAt - scaleStartAt) / scaleStep + 1;
+            var scaleStartAt = -90;
+            var scaleEndAt = 90;
+            var scaleStep = 10;
+            var marksQuantity = (scaleEndAt - scaleStartAt) / scaleStep + 1;
 
             DrawBackground();
 
-            double textXOffset = lineWidth;
+            var textXOffset = lineWidth;
             // Distance between scale marks * coefficient
-            int textSize = Convert.ToInt32(ThePitchScale.ActualHeight / marksQuantity * 0.5);
+            var textSize = Convert.ToInt32(ThePitchScale.ActualHeight / marksQuantity * 0.5);
             textSize = textSize == 0 ? 12 : textSize; // if ActualHeight == 0 (on init) set some default size
 
 
             // Draw Scale Marking
-            for (int i = scaleStartAt; i <= scaleEndAt; i += scaleStep)
+            for (var i = scaleStartAt; i <= scaleEndAt; i += scaleStep)
             {
-                Rectangle rectDozenLine = new Rectangle
+                var rectDozenLine = new Rectangle
                 {
                     Fill = MarksColor, Height = LineThickness, Width = lineWidth
                 };
@@ -173,13 +172,13 @@ namespace GyroHorizon
                 ThePitchScale.Children.Add(rectDozenLine);
 
                 // Numbering of marks
-                TextBlock textR = new TextBlock
+                var textR = new TextBlock
                 {
                     // Canvas doesn't support TextAlignment -> space or minus
-                    Text = -i < 0 ? (-i).ToString() : " " + (-i), // and inverting i
+                    Text = -i < 0 ? (-i).ToString() : " " + -i, // and inverting i
                     Foreground = MarksColor,
                     FontSize = textSize,
-                    RenderTransformOrigin = new Point(0.5, 0.5),
+                    RenderTransformOrigin = new Point(0.5, 0.5)
                 };
 
                 Canvas.SetTop(textR, yOffset - textSize);
@@ -188,7 +187,7 @@ namespace GyroHorizon
 
 
                 if (i <= scaleStartAt) continue;
-                Rectangle rectHalfLine = new Rectangle
+                var rectHalfLine = new Rectangle
                 {
                     Fill = MarksColor, Height = LineThickness, Width = lineWidth / 2
                 };
@@ -198,7 +197,7 @@ namespace GyroHorizon
                 ThePitchScale.Children.Add(rectHalfLine);
             }
 
-            Rectangle centerLine = new Rectangle
+            var centerLine = new Rectangle
             {
                 Fill = MarksColor, Height = 1, Width = 3 * lineWidth
             };
@@ -209,7 +208,7 @@ namespace GyroHorizon
             ThePitchScale.InvalidateVisual(); // Force the canvas to refresh
         }
 
-        void DrawRollScale()
+        private void DrawRollScale()
         {
             TheRollScale.Children.Clear();
             // TODO doesnt clear but iterate and update
@@ -218,22 +217,22 @@ namespace GyroHorizon
             var radius = Math.Min(TheRollScale.ActualWidth, TheRollScale.ActualHeight) / 3;
             RollScaleRadius = radius;
 
-            int scaleStartAt = -90;
-            int scaleEndAt = 90;
-            int scaleStep = 10;
+            var scaleStartAt = -90;
+            var scaleEndAt = 90;
+            var scaleStep = 10;
 
-            Point startPoint = new Point(scaleCenter.X, scaleCenter.Y - radius);
-            Point endPoint = new Point(scaleCenter.X, scaleCenter.Y + radius);
+            var startPoint = new Point(scaleCenter.X, scaleCenter.Y - radius);
+            var endPoint = new Point(scaleCenter.X, scaleCenter.Y + radius);
             // Semicircle
-            ArcSegment arcSegment = new ArcSegment(endPoint, new Size(radius, radius), 0, false,
+            var arcSegment = new ArcSegment(endPoint, new Size(radius, radius), 0, false,
                 SweepDirection.Counterclockwise, true);
-            PathGeometry geometry =
+            var geometry =
                 new PathGeometry(new[] { new PathFigure(startPoint, new[] { arcSegment }, false) });
-            Path path = new Path
+            var path = new Path
             {
                 Data = geometry,
                 Stroke = MarksColor,
-                StrokeThickness = LineThickness,
+                StrokeThickness = LineThickness
             };
             TheRollScale.Children.Add(path);
 
@@ -241,11 +240,11 @@ namespace GyroHorizon
             var textSize = Math.PI * radius / 18 * 0.7;
             textSize = textSize == 0 ? 12 : textSize; // if ActualHeight == 0 (on init) set some default size
 
-            double lineLength = radius / 6.0;
+            var lineLength = radius / 6.0;
             // Draw Scale Marking
-            for (int i = scaleStartAt; i <= scaleEndAt; i += scaleStep)
+            for (var i = scaleStartAt; i <= scaleEndAt; i += scaleStep)
             {
-                double angle = i + 180.0; // Rotate
+                var angle = i + 180.0; // Rotate
                 angle = Math.PI * angle / 180.0; // To radians
 
                 var xCoord = Math.Cos(angle) * radius;
@@ -253,10 +252,10 @@ namespace GyroHorizon
                 var xCoordEnd = Math.Cos(angle) * (radius - lineLength);
                 var yCoordEnd = Math.Sin(angle) * (radius - lineLength);
 
-                Line line = new Line
+                var line = new Line
                 {
                     X1 = xCoord, Y1 = yCoord, X2 = xCoordEnd, Y2 = yCoordEnd,
-                    StrokeThickness = LineThickness, Stroke = MarksColor,
+                    StrokeThickness = LineThickness, Stroke = MarksColor
                 };
                 Canvas.SetTop(line, scaleCenter.Y);
                 Canvas.SetLeft(line, scaleCenter.X);
@@ -265,10 +264,10 @@ namespace GyroHorizon
                 // Text
                 xCoordEnd = Math.Cos(angle) * (radius + lineLength / 2);
                 yCoordEnd = Math.Sin(angle) * (radius + lineLength / 2);
-                TextBlock text = new TextBlock
+                var text = new TextBlock
                 {
                     Text = i < 0 ? i.ToString() : " " + i, // minus or space
-                    FontSize = textSize,
+                    FontSize = textSize
                 };
                 Canvas.SetTop(text, scaleCenter.Y + yCoordEnd - textSize / 1.5);
                 Canvas.SetLeft(text, scaleCenter.X + xCoordEnd - textSize);
@@ -278,7 +277,7 @@ namespace GyroHorizon
             TheRollScale.InvalidateVisual();
         }
 
-        void DrawRollIndicator()
+        private void DrawRollIndicator()
         {
             TheRollIndicatorCanvas.Children.Clear();
             var center = RollScaleRadius;
@@ -288,25 +287,25 @@ namespace GyroHorizon
             var rollIndicatorColor = Brushes.Gold;
             var rollIndicatorThickness = LineThickness * 1.5;
 
-            Line line = new Line
+            var line = new Line
             {
                 X1 = 0, Y1 = center, X2 = center - smallCircleRadius + rollIndicatorThickness / 2, Y2 = center,
                 Stroke = rollIndicatorColor, StrokeThickness = rollIndicatorThickness
             };
             TheRollIndicatorCanvas.Children.Add(line);
 
-            Point startPoint = new Point(center - smallCircleRadius, center);
-            Point endPoint = new Point(center + smallCircleRadius, center);
+            var startPoint = new Point(center - smallCircleRadius, center);
+            var endPoint = new Point(center + smallCircleRadius, center);
 
-            ArcSegment arcSegment = new ArcSegment(endPoint, new Size(smallCircleRadius, smallCircleRadius), 0, false,
+            var arcSegment = new ArcSegment(endPoint, new Size(smallCircleRadius, smallCircleRadius), 0, false,
                 SweepDirection.Counterclockwise, true);
-            PathGeometry geometry =
+            var geometry =
                 new PathGeometry(new[] { new PathFigure(startPoint, new[] { arcSegment }, false) });
-            Path path = new Path
+            var path = new Path
             {
                 Data = geometry,
                 Stroke = rollIndicatorColor,
-                StrokeThickness = rollIndicatorThickness,
+                StrokeThickness = rollIndicatorThickness
             };
             TheRollIndicatorCanvas.Children.Add(path);
 
@@ -331,24 +330,19 @@ namespace GyroHorizon
 
         private static object CoerceRollCallback(DependencyObject d, object basevalue)
         {
-            if (!double.TryParse(basevalue.ToString(), out double value)) return 0.0;
+            if (!double.TryParse(basevalue.ToString(), out var value)) return 0.0;
             return Math.Max(-90.0, Math.Min(90.0, value));
         }
 
         private static void RollChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is GyroHorizonUI gyro)) return;
-            if (!double.TryParse(e.NewValue.ToString(), out double value)) return;
+            if (!double.TryParse(e.NewValue.ToString(), out var value)) return;
 
             // TODO extract to method
             if (Math.Abs(value) > gyro.ValidRoll && gyro.RollExcess == false)
-            {
                 gyro.RollExcess = true;
-            }
-            else if (gyro.RollExcess == true && Math.Abs(value) <= gyro.ValidRoll)
-            {
-                gyro.RollExcess = false;
-            }
+            else if (gyro.RollExcess && Math.Abs(value) <= gyro.ValidRoll) gyro.RollExcess = false;
         }
 
         public double Roll
@@ -367,23 +361,18 @@ namespace GyroHorizon
 
         private static object CoercePitchCallback(DependencyObject d, object basevalue)
         {
-            if (!double.TryParse(basevalue.ToString(), out double value)) return 0.0;
+            if (!double.TryParse(basevalue.ToString(), out var value)) return 0.0;
             return Math.Max(-90, Math.Min(90, value));
         }
 
         private static void PitchChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is GyroHorizonUI gyro)) return;
-            if (!double.TryParse(e.NewValue.ToString(), out double value)) return;
+            if (!double.TryParse(e.NewValue.ToString(), out var value)) return;
 
             if (Math.Abs(value) > gyro.ValidPitch && gyro.PitchExcess == false)
-            {
                 gyro.PitchExcess = true;
-            }
-            else if (gyro.PitchExcess == true && Math.Abs(value) <= gyro.ValidPitch)
-            {
-                gyro.PitchExcess = false;
-            }
+            else if (gyro.PitchExcess && Math.Abs(value) <= gyro.ValidPitch) gyro.PitchExcess = false;
 
             gyro.PitchYOffset = gyro.ConvertPitchToYOffset(value);
 
@@ -411,14 +400,14 @@ namespace GyroHorizon
 
         private static object CoerceValueCallback(DependencyObject d, object basevalue)
         {
-            if (!double.TryParse(basevalue.ToString(), out double value)) return 0.0;
+            if (!double.TryParse(basevalue.ToString(), out var value)) return 0.0;
             return Math.Max(-1, Math.Min(1, value));
         }
 
         private static void DriftChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is GyroHorizonUI gyro)) return;
-            if (!double.TryParse(e.NewValue.ToString(), out double value)) return;
+            if (!double.TryParse(e.NewValue.ToString(), out var value)) return;
 
             gyro.DriftXOffset = gyro.ConvertDriftToXOffset(value);
         }

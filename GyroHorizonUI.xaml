@@ -12,8 +12,8 @@
         <!--Pitch Scale-->
         <Canvas x:Name="ThePitchScale"
                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                Width="{calcBinding:Binding '0.1*ActualWidth', ElementName=This}"
-                Height="{calcBinding:Binding '3*ActualHeight', ElementName=This}" />
+                Width="{calcBinding:Binding '0.1 * ActualWidth', ElementName=This}"
+                Height="{calcBinding:Binding '3 * ActualHeight', ElementName=This}" />
 
         <!--Roll Scale-->
         <Canvas x:Name="TheRollScale"
@@ -26,7 +26,7 @@
               RenderTransformOrigin=".5,.5">
 
             <Grid.RenderTransform>
-                <RotateTransform Angle="{Binding ElementName=This, Path=Roll}" />
+                <RotateTransform Angle="{Binding Roll, ElementName=This}" />
             </Grid.RenderTransform>
 
             <!--Roll Indicator : Flashing animation-->
@@ -61,7 +61,7 @@
             <!--Roll Indicator : Visual-->
             <Canvas x:Name="TheRollIndicatorCanvas" HorizontalAlignment="Center" VerticalAlignment="Center"
                     Width="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}"
-                    Height="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}"/>
+                    Height="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}" />
 
         </Grid>
 
