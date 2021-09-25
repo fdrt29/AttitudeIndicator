@@ -17,21 +17,20 @@
 
         <!--Roll Scale-->
         <Canvas x:Name="TheRollScale"
-                VerticalAlignment="Center" HorizontalAlignment="Center"
                 Width="{Binding ActualWidth, ElementName=This}"
                 Height="{Binding ActualHeight, ElementName=This}" />
 
         <!--Roll Indicator-->
-        <Grid x:Name="TheRollIndicator" HorizontalAlignment="Center" VerticalAlignment="Center"
-              RenderTransformOrigin=".5,.5">
-
-            <Grid.RenderTransform>
+        <Canvas x:Name="TheRollIndicatorCanvas" RenderTransformOrigin=".5,.5"
+                Width="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}"
+                Height="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}">
+            <Canvas.RenderTransform>
                 <RotateTransform Angle="{Binding Roll, ElementName=This}" />
-            </Grid.RenderTransform>
+            </Canvas.RenderTransform>
 
             <!--Roll Indicator : Flashing animation-->
-            <Grid.Style>
-                <Style TargetType="{x:Type Grid}">
+            <Canvas.Style>
+                <Style TargetType="{x:Type Canvas}">
                     <Style.Resources>
                         <Storyboard x:Key="FlashAnimation">
                             <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" AutoReverse="True"
@@ -56,14 +55,9 @@
 
                     </Style.Triggers>
                 </Style>
-            </Grid.Style>
+            </Canvas.Style>
+        </Canvas>
 
-            <!--Roll Indicator : Visual-->
-            <Canvas x:Name="TheRollIndicatorCanvas" HorizontalAlignment="Center" VerticalAlignment="Center"
-                    Width="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}"
-                    Height="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}" />
-
-        </Grid>
 
         <!--Drift Scale-->
         <Grid x:Name="TheDriftScale"
