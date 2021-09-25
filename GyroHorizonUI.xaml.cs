@@ -14,17 +14,16 @@ namespace GyroHorizon
         public GyroHorizonUI()
         {
             InitializeComponent();
-            _vm = new GyroHorizonVM(this);
             SizeChanged += OnSizeChanged;
             Loaded += OnLoaded;
         }
 
 
-        private GyroHorizonVM _vm;
         private double _yOffset;
         private bool _rollExcess;
         private bool _pitchExcess;
         private SolidColorBrush _marksColor = Brushes.Black;
+
 
         public SolidColorBrush MarksColor
         {
@@ -37,12 +36,12 @@ namespace GyroHorizon
             }
         }
 
-
         public double YOffset
         {
             get => _yOffset;
             set
             {
+                if (value.Equals(_yOffset)) return;
                 _yOffset = value;
                 OnPropertyChanged();
             }
@@ -53,6 +52,7 @@ namespace GyroHorizon
             get => _rollExcess;
             set
             {
+                if (value.Equals(_rollExcess)) return;
                 _rollExcess = value;
                 OnPropertyChanged();
             }
@@ -63,6 +63,7 @@ namespace GyroHorizon
             get => _pitchExcess;
             private set
             {
+                if (value.Equals(_pitchExcess)) return;
                 _pitchExcess = value;
                 OnPropertyChanged();
             }
@@ -127,7 +128,7 @@ namespace GyroHorizon
 
             double textXOffset = lineWidth;
             // Distance between scale marks * coefficient
-            int textSize = Convert.ToInt32(ThePitchScale.ActualHeight / marksQuantity * 0.6);
+            int textSize = Convert.ToInt32(ThePitchScale.ActualHeight / marksQuantity * 0.5);
             textSize = textSize == 0 ? 12 : textSize; // if ActualHeight == 0 (on init) set some default size
 
 
@@ -208,7 +209,7 @@ namespace GyroHorizon
             };
             TheRollScale.Children.Add(path);
 
-            var textSize = Math.PI * radius / 18 / 2;
+            var textSize = Math.PI * radius / 18 * 0.7;
             textSize = textSize == 0 ? 12 : textSize; // if ActualHeight == 0 (on init) set some default size
 
             // Arc length

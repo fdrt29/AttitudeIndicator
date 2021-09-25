@@ -38,7 +38,8 @@
                     <Style.Resources>
                         <Storyboard x:Key="FlashAnimation">
                             <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0" AutoReverse="True"
-                                             Duration="0:0:0.5" RepeatBehavior="Forever" />
+                                             Duration="0:0:0.2"
+                                             RepeatBehavior="Forever" />
                         </Storyboard>
                     </Style.Resources>
 

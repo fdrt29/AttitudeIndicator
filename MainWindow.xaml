@@ -45,13 +45,13 @@
                            Text="{Binding Value, ElementName=SliderRoll}" />
 
                 <TextBlock Grid.Row="3" Text="ValidPitch" VerticalAlignment="Center" />
-                <Slider Name="SliderValidPitch" Grid.Column="1" Grid.Row="3" Minimum="0" Maximum="90" Value="0"
+                <Slider Name="SliderValidPitch" Grid.Column="1" Grid.Row="3" Minimum="0" Maximum="90" Value="55"
                         TickFrequency="20" TickPlacement="BottomRight" VerticalAlignment="Center" />
                 <TextBlock Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
                            Text="{Binding Value, ElementName=SliderValidPitch}" />
 
                 <TextBlock Grid.Row="4" Text="ValidRoll" VerticalAlignment="Center" />
-                <Slider Name="SliderValidRoll" Grid.Column="1" Grid.Row="4" Minimum="0" Maximum="90" Value="0"
+                <Slider Name="SliderValidRoll" Grid.Column="1" Grid.Row="4" Minimum="0" Maximum="90" Value="45"
                         TickFrequency="20" TickPlacement="BottomRight" VerticalAlignment="Center" />
                 <TextBlock Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
                            Text="{Binding Value, ElementName=SliderValidRoll}" />
