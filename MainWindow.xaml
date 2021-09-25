@@ -27,19 +27,19 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <TextBlock Text="Drift" VerticalAlignment="Center" />
-                <Slider Grid.Column="1" Name="SliderDrift" Minimum="-180" Maximum="180" Value="0" TickFrequency="20"
+                <Slider Grid.Column="1" Name="SliderDrift" Minimum="-2" Maximum="2" Value="0" TickFrequency="20"
                         TickPlacement="BottomRight" VerticalAlignment="Center" />
                 <TextBlock Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
                            Text="{Binding Value, ElementName=SliderDrift}" />
 
                 <TextBlock Grid.Row="1" Text="Pitch" VerticalAlignment="Center" />
-                <Slider Name="SliderPitch" Grid.Column="1" Grid.Row="1" Minimum="-90" Maximum="90" Value="0"
+                <Slider Name="SliderPitch" Grid.Column="1" Grid.Row="1" Minimum="-100" Maximum="100" Value="0"
                         TickFrequency="100" TickPlacement="BottomRight" VerticalAlignment="Center" />
                 <TextBlock Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
                            Text="{Binding Value, ElementName=SliderPitch}" />
 
                 <TextBlock Grid.Row="2" Text="Roll" VerticalAlignment="Center" />
-                <Slider Name="SliderRoll" Grid.Column="1" Grid.Row="2" Minimum="-90" Maximum="90" Value="0"
+                <Slider Name="SliderRoll" Grid.Column="1" Grid.Row="2" Minimum="-100" Maximum="100" Value="0"
                         TickFrequency="20" TickPlacement="BottomRight" VerticalAlignment="Center" />
                 <TextBlock Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" TextAlignment="Right"
                            Text="{Binding Value, ElementName=SliderRoll}" />

@@ -19,10 +19,12 @@ namespace GyroHorizon
         }
 
 
-        private double _yOffset;
+        private double _pitchYOffset;
         private bool _rollExcess;
         private bool _pitchExcess;
         private SolidColorBrush _marksColor = Brushes.Black;
+        private double _driftXOffset;
+        private double _rollScaleRadius;
 
 
         public SolidColorBrush MarksColor
@@ -36,13 +38,24 @@ namespace GyroHorizon
             }
         }
 
-        public double YOffset
+        public double PitchYOffset
         {
-            get => _yOffset;
+            get => _pitchYOffset;
             set
             {
-                if (value.Equals(_yOffset)) return;
-                _yOffset = value;
+                if (value.Equals(_pitchYOffset)) return;
+                _pitchYOffset = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public double DriftXOffset
+        {
+            get => _driftXOffset;
+            set
+            {
+                if (value.Equals(_driftXOffset)) return;
+                _driftXOffset = value;
                 OnPropertyChanged();
             }
         }
@@ -69,6 +82,17 @@ namespace GyroHorizon
             }
         }
 
+        public double RollScaleRadius
+        {
+            get => _rollScaleRadius;
+            set
+            {
+                if (value.Equals(_rollScaleRadius)) return;
+                _rollScaleRadius = value;
+                OnPropertyChanged();
+            }
+        }
+
         private double LineThickness => 3;
 
 
@@ -76,13 +100,16 @@ namespace GyroHorizon
         {
             DrawPitchScale();
             DrawRollScale();
+            DrawRollIndicator();
         }
 
         private void OnSizeChanged(object sender, SizeChangedEventArgs args)
         {
-            YOffset = ConvertPitchToYOffset(Pitch);
+            PitchYOffset = ConvertPitchToYOffset(Pitch);
+            DriftXOffset = ConvertDriftToXOffset(Drift);
             DrawPitchScale();
             DrawRollScale();
+            DrawRollIndicator();
         }
 
         private void DrawBackground()
@@ -96,14 +123,14 @@ namespace GyroHorizon
             {
                 Fill = Brushes.SkyBlue, Height = skyRectHeight, Width = ActualWidth
             };
-            Canvas.SetTop(skyRect, -skyRectHeight / 2 + YOffset);
+            Canvas.SetTop(skyRect, -skyRectHeight / 2 + PitchYOffset);
             Canvas.SetLeft(skyRect, pitchWidthCenter - ActualWidth / 2);
 
             Rectangle groundRect = new Rectangle
             {
                 Fill = Brushes.SaddleBrown, Height = skyRectHeight, Width = ActualWidth
             };
-            Canvas.SetTop(groundRect, skyRectHeight / 2 + YOffset);
+            Canvas.SetTop(groundRect, skyRectHeight / 2 + PitchYOffset);
             Canvas.SetLeft(groundRect, pitchWidthCenter - ActualWidth / 2);
 
             ThePitchScale.Children.Add(skyRect);
@@ -140,7 +167,7 @@ namespace GyroHorizon
                     Fill = MarksColor, Height = LineThickness, Width = lineWidth
                 };
 
-                var yOffset = scaleHeightCenter + ConvertPitchToYOffset(i) + YOffset;
+                var yOffset = scaleHeightCenter + ConvertPitchToYOffset(i) + PitchYOffset;
 
                 Canvas.SetTop(rectDozenLine, yOffset - LineThickness / 2);
                 ThePitchScale.Children.Add(rectDozenLine);
@@ -188,17 +215,18 @@ namespace GyroHorizon
             // TODO doesnt clear but iterate and update
 
             var scaleCenter = new Point(TheRollScale.ActualWidth / 2, TheRollScale.ActualHeight / 2);
-            var radius = Math.Max(TheRollScale.ActualWidth, TheRollScale.ActualHeight) / 4;
+            var radius = Math.Min(TheRollScale.ActualWidth, TheRollScale.ActualHeight) / 3;
+            RollScaleRadius = radius;
 
             int scaleStartAt = -90;
             int scaleEndAt = 90;
             int scaleStep = 10;
 
-            Point startPoint = new Point(scaleCenter.X - radius, scaleCenter.Y);
-            Point endPoint = new Point(scaleCenter.X + radius, scaleCenter.Y);
+            Point startPoint = new Point(scaleCenter.X, scaleCenter.Y - radius);
+            Point endPoint = new Point(scaleCenter.X, scaleCenter.Y + radius);
             // Semicircle
             ArcSegment arcSegment = new ArcSegment(endPoint, new Size(radius, radius), 0, false,
-                SweepDirection.Clockwise, true);
+                SweepDirection.Counterclockwise, true);
             PathGeometry geometry =
                 new PathGeometry(new[] { new PathFigure(startPoint, new[] { arcSegment }, false) });
             Path path = new Path
@@ -209,15 +237,15 @@ namespace GyroHorizon
             };
             TheRollScale.Children.Add(path);
 
+            // Arc length
             var textSize = Math.PI * radius / 18 * 0.7;
             textSize = textSize == 0 ? 12 : textSize; // if ActualHeight == 0 (on init) set some default size
 
-            // Arc length
             double lineLength = radius / 6.0;
             // Draw Scale Marking
             for (int i = scaleStartAt; i <= scaleEndAt; i += scaleStep)
             {
-                double angle = i - 90.0; // Rotate
+                double angle = i + 180.0; // Rotate
                 angle = Math.PI * angle / 180.0; // To radians
 
                 var xCoord = Math.Cos(angle) * radius;
@@ -234,7 +262,7 @@ namespace GyroHorizon
                 Canvas.SetLeft(line, scaleCenter.X);
                 TheRollScale.Children.Add(line);
 
-
+                // Text
                 xCoordEnd = Math.Cos(angle) * (radius + lineLength / 2);
                 yCoordEnd = Math.Sin(angle) * (radius + lineLength / 2);
                 TextBlock text = new TextBlock
@@ -242,12 +270,54 @@ namespace GyroHorizon
                     Text = i < 0 ? i.ToString() : " " + i, // minus or space
                     FontSize = textSize,
                 };
-                Canvas.SetTop(text, scaleCenter.Y + yCoordEnd - textSize);
+                Canvas.SetTop(text, scaleCenter.Y + yCoordEnd - textSize / 1.5);
                 Canvas.SetLeft(text, scaleCenter.X + xCoordEnd - textSize);
                 TheRollScale.Children.Add(text);
             }
 
             TheRollScale.InvalidateVisual();
+        }
+
+        void DrawRollIndicator()
+        {
+            TheRollIndicatorCanvas.Children.Clear();
+            var center = RollScaleRadius;
+
+            var smallCircleRadius = 0.2 * RollScaleRadius;
+
+            var rollIndicatorColor = Brushes.Gold;
+            var rollIndicatorThickness = LineThickness * 1.5;
+
+            Line line = new Line
+            {
+                X1 = 0, Y1 = center, X2 = center - smallCircleRadius + rollIndicatorThickness / 2, Y2 = center,
+                Stroke = rollIndicatorColor, StrokeThickness = rollIndicatorThickness
+            };
+            TheRollIndicatorCanvas.Children.Add(line);
+
+            Point startPoint = new Point(center - smallCircleRadius, center);
+            Point endPoint = new Point(center + smallCircleRadius, center);
+
+            ArcSegment arcSegment = new ArcSegment(endPoint, new Size(smallCircleRadius, smallCircleRadius), 0, false,
+                SweepDirection.Counterclockwise, true);
+            PathGeometry geometry =
+                new PathGeometry(new[] { new PathFigure(startPoint, new[] { arcSegment }, false) });
+            Path path = new Path
+            {
+                Data = geometry,
+                Stroke = rollIndicatorColor,
+                StrokeThickness = rollIndicatorThickness,
+            };
+            TheRollIndicatorCanvas.Children.Add(path);
+
+            line = new Line
+            {
+                X1 = center + smallCircleRadius - rollIndicatorThickness / 2, Y1 = center, X2 = center * 2, Y2 = center,
+                Stroke = rollIndicatorColor, StrokeThickness = rollIndicatorThickness
+            };
+            TheRollIndicatorCanvas.Children.Add(line);
+
+            TheRollIndicatorCanvas.InvalidateVisual();
         }
 
 
@@ -256,7 +326,14 @@ namespace GyroHorizon
         #region DependencyProperty Roll
 
         public static readonly DependencyProperty RollProperty = RollProperty = DependencyProperty.Register("Roll",
-            typeof(double), typeof(GyroHorizonUI), new FrameworkPropertyMetadata(RollChangedCallback));
+            typeof(double), typeof(GyroHorizonUI),
+            new FrameworkPropertyMetadata(RollChangedCallback, CoerceRollCallback));
+
+        private static object CoerceRollCallback(DependencyObject d, object basevalue)
+        {
+            if (!double.TryParse(basevalue.ToString(), out double value)) return 0.0;
+            return Math.Max(-90.0, Math.Min(90.0, value));
+        }
 
         private static void RollChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -286,7 +363,13 @@ namespace GyroHorizon
 
         public static readonly DependencyProperty PitchProperty = DependencyProperty.Register("Pitch", typeof(double),
             typeof(GyroHorizonUI),
-            new FrameworkPropertyMetadata(PitchChangedCallback));
+            new FrameworkPropertyMetadata(PitchChangedCallback, CoercePitchCallback));
+
+        private static object CoercePitchCallback(DependencyObject d, object basevalue)
+        {
+            if (!double.TryParse(basevalue.ToString(), out double value)) return 0.0;
+            return Math.Max(-90, Math.Min(90, value));
+        }
 
         private static void PitchChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -302,9 +385,9 @@ namespace GyroHorizon
                 gyro.PitchExcess = false;
             }
 
-            gyro.YOffset = gyro.ConvertPitchToYOffset(gyro.Pitch);
+            gyro.PitchYOffset = gyro.ConvertPitchToYOffset(value);
 
-            gyro.DrawPitchScale();
+            gyro.DrawPitchScale(); // Redraw pitch scale
         }
 
         private double ConvertPitchToYOffset(double pitch)
@@ -324,7 +407,27 @@ namespace GyroHorizon
 
         public static readonly DependencyProperty DriftProperty = DependencyProperty.Register("Drift", typeof(double),
             typeof(GyroHorizonUI),
-            new FrameworkPropertyMetadata(0.0));
+            new FrameworkPropertyMetadata(DriftChangedCallback, CoerceValueCallback));
+
+        private static object CoerceValueCallback(DependencyObject d, object basevalue)
+        {
+            if (!double.TryParse(basevalue.ToString(), out double value)) return 0.0;
+            return Math.Max(-1, Math.Min(1, value));
+        }
+
+        private static void DriftChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (!(d is GyroHorizonUI gyro)) return;
+            if (!double.TryParse(e.NewValue.ToString(), out double value)) return;
+
+            gyro.DriftXOffset = gyro.ConvertDriftToXOffset(value);
+        }
+
+        private double ConvertDriftToXOffset(double drift)
+        {
+            var centerX = TheDriftScale.ActualWidth / 2;
+            return drift * (centerX - TheDriftIndicator.ActualWidth / 2);
+        }
 
         public double Drift
         {

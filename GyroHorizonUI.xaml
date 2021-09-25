@@ -3,8 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:GyroHorizon"
-             xmlns:gyroHorizon="clr-namespace:GyroHorizon"
              xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="300"
@@ -14,9 +12,8 @@
         <!--Pitch Scale-->
         <Canvas x:Name="ThePitchScale"
                 VerticalAlignment="Center" HorizontalAlignment="Center"
-                Width="{calcBinding:Binding '0.5*ActualWidth', ElementName=TheRollIndicator}"
-                Height="{calcBinding:Binding '2*ActualHeight', ElementName=This}" />
-        <!--TODO mb make background as separate element (grid)-->
+                Width="{calcBinding:Binding '0.1*ActualWidth', ElementName=This}"
+                Height="{calcBinding:Binding '3*ActualHeight', ElementName=This}" />
 
         <!--Roll Scale-->
         <Canvas x:Name="TheRollScale"
@@ -62,14 +59,49 @@
             </Grid.Style>
 
             <!--Roll Indicator : Visual-->
-            <Ellipse HorizontalAlignment="Center" Width="50" Stroke="Chartreuse" StrokeThickness="3"
-                     VerticalAlignment="Center" Height="50" />
-            <Rectangle HorizontalAlignment="Left" Height="3" Margin="0,0,100,0" Fill="Chartreuse"
-                       VerticalAlignment="Center" Width="60" />
-            <Rectangle HorizontalAlignment="Left" Height="3" Margin="100,0,0,0" Fill="Chartreuse"
-                       VerticalAlignment="Center" Width="60" />
+            <Canvas x:Name="TheRollIndicatorCanvas" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Width="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}"
+                    Height="{calcBinding:Binding 'RollScaleRadius * 2', ElementName=This}"/>
 
         </Grid>
+
+        <!--Drift Scale-->
+        <Grid x:Name="TheDriftScale"
+              Height="{calcBinding:Binding 'RollScaleRadius * 0.1', ElementName=This}"
+              Width="{calcBinding:Binding 'RollScaleRadius * 0.8', ElementName=This}">
+
+            <Grid.RenderTransform>
+                <TranslateTransform Y="{calcBinding:Binding 'RollScaleRadius * 0.5',
+                ElementName=This}" />
+            </Grid.RenderTransform>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="2" />
+                <ColumnDefinition Width="{Binding ActualWidth,ElementName=TheDriftIndicator}" />
+                <ColumnDefinition Width="2" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Rectangle Grid.ColumnSpan="5" Fill="Black" Stroke="Beige" RadiusX="5" RadiusY="5" />
+
+            <!--Drift Indicator-->
+            <Ellipse x:Name="TheDriftIndicator" Grid.ColumnSpan="5"
+                     Height="{Binding ActualHeight, ElementName=TheDriftScale}"
+                     Width="{Binding ActualHeight, ElementName=TheDriftScale}"
+                     Fill="Gray"
+                     Stroke="Beige"
+                     StrokeThickness="3"
+                     VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Ellipse.RenderTransform>
+                    <TranslateTransform X="{Binding DriftXOffset, ElementName=This}" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+
+            <Rectangle Grid.Column="1" Fill="Beige" />
+            <Rectangle Grid.Column="3" Fill="Beige" />
+
+        </Grid>
+
     </Grid>
 
 </UserControl>
